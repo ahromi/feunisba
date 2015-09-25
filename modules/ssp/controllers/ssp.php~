@@ -1,0 +1,136 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+class Ssp extends MX_Controller 
+{
+
+	/** function construct
+	------------------------------------------------------------------------ **/
+	function __construct()
+	{
+		parent::__construct();
+		if ($this->session->userdata('feun_abus') <> 'true') 
+		 {
+			 $this->session->sess_destroy();
+			 header('location: '.base_url());
+			 exit;
+		 }
+		$this->load->model('model_ssp');
+	}
+	
+	/** function index
+	------------------------------------------------------------------------ **/
+	public function index()
+	{
+		$this->ssp();
+	}
+	
+	public function ssp()
+	{
+		$data['css_menu']	= '<script>
+									document.getElementById("dashboard").className = "";
+									document.getElementById("forms_menu").className = "mega-menu active";
+									</script>';
+		$npm=$this->security->xss_clean($this->session->userdata('feun_key'));
+		$result = $this->main_models->ambilMhsOrtu($npm);
+									  
+		if ( $result == TRUE) //apabila dilempar dari model true
+		{ 	
+			 //Ambil data array kemudian passing string ke view
+			 //Data Pribadi
+			 $data['nm_mhs']			= $result[0]['nama'];
+			 $data['npm']				= $result[0]['npm'];
+			 $data['prodi']			= $result[0]['prodi'];
+			 $data['email']			= $result[0]['email'];
+			 
+			 //Data Orang Tua
+			 $data['nm_ortu']			= $result[0]['nama_ortu'];
+			 $data['alamat_ortu']	= $result[0]['alamat'];
+			 $data['pekerjaan']		= $result[0]['pekerjaan'];
+			 $data['pangkat']			= $result[0]['pangkat'];
+			 $data['jabatan']			= $result[0]['jabatan'];
+			 $data['nip']				= $result[0]['nip'];
+			 $data['instansi']		= $result[0]['instansi'];
+
+			 //Data Akun
+			 $data['username']		= $result[0]['username'];
+			 
+			 //Pesan sukses atau gagal
+			 $data['error']			= $this->session->flashdata('gagal');
+			 $data['pesan']			= $this->session->flashdata('sukses');
+
+			 
+			 $this->template->load('main_views','view_ssp',$data);
+		} else 
+		{
+			header('location:'.base_url());
+		}
+	}
+	
+	function inputSsp()
+	{
+		//Ambil data post dari field Data Penelitian
+		$judulSkripsi			= $this->security->xss_clean($this->input->post('judul_skripsi'));
+		$bidangSkripsi			= $this->security->xss_clean($this->input->post('bidang_skripsi'));
+		$matakuliah				= $this->security->xss_clean($this->input->post('matakuliah'));
+		$dosenPembimbing		= $this->security->xss_clean($this->input->post('dosen_pembimbing'));
+		$anggota					= $this->security->xss_clean($this->input->post('anggota'));
+		$namaPerusahaan		= $this->security->xss_clean($this->input->post('nama_perusahaan'));
+		$alamatPerusahaan		= $this->security->xss_clean($this->input->post('alamat_perusahaan'));
+		
+		$created					= date('Y-m-d H:i:s');
+		$pengguna				= $this->session->userdata('feun_username');
+		$cekphoto				= $_FILES['userfile']['name'];
+		if(!$cekphoto) 
+		{
+			$this->session->set_flashdata('gagal', 'Pilih file yang akan diunggah, silakan ulangi kembali');
+			header('location: '.base_url().'index.php/ssp');
+		}else
+		{
+			$main_dir		= opendir(dirname($_SERVER["SCRIPT_FILENAME"])."/uploads/"); //Buka Directory Utama untuk Upload data
+			$pengguna_dir	= opendir(dirname($_SERVER["SCRIPT_FILENAME"])."/uploads/".$pengguna); //Buka directory pengguna
+			$modul_dir		= opendir(dirname($_SERVER["SCRIPT_FILENAME"])."/uploads/".$pengguna."/ssp");
+				
+			if(false == readdir($pengguna_dir)) //Jika Tidak ditemukan Directory Pengguna, Maka
+			{
+				mkdir(dirname($_SERVER["SCRIPT_FILENAME"])."/uploads/".$pengguna."/ssp",0777,true); //Buat Directory Baru (Recursive), yakni dirctory pengguna dan directory modul
+			}else if(false == readdir($modul_dir))												//Jika ditemukan directory pengguna, maka
+			{
+				mkdir(dirname($_SERVER["SCRIPT_FILENAME"])."/uploads/".$pengguna."/ssp",0777);						//Hanya buat directory modul saja.
+			}else 
+			{
+				closedir($modul_dir);
+			}
+    		
+			$namafile						= $cekpoto;
+			$config['upload_path']		= dirname($_SERVER["SCRIPT_FILENAME"])."/uploads/".$pengguna."/ssp";
+			$config['allowed_types']	= 'gif|jpg|png';
+			$config['max_size']			= '5000';
+			$config['max_width']  		= '1280';
+			$config['max_height']  		= '1024';
+			$config['overwrite']			= TRUE;
+
+			$this->load->library('upload', $config);
+			$this->upload->initialize($config);
+
+			if ( ! $this->upload->do_upload())
+			{
+				$this->session->set_flashdata('gagal', 'Data gagal diunggah, silakan ulangi kembali');
+				header('location: '.base_url().'index.php/ssp');
+			}
+			else
+			{
+				$npm						= $pengguna;
+				$pdp						= str_replace(' ', '_', $_FILES['userfile']['name']);//Mengganti karakter spasi dengan underscores
+				$status					= '0';
+				$tgl_pengajuan			= $created;
+				
+				$this->model_ssp->saveSsp($npm,$judulSkripsi,$bidangSkripsi,$matakuliah,$dosenPembimbing,$anggota,$namaPerusahaan,$alamatPerusahaan,$pdp,$status,$tgl_pengajuan);
+				$this->session->set_flashdata('sukses', 'Berkas '.$_FILES['userfile']['name'].' berhasil diunggah');
+				header('location: '.base_url().'index.php/ssp');
+			}
+		}
+	}
+}
+
+/* End of file ssp.php */
+/* Location: ./modules/ssp/controllers/ssp.php */

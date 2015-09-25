@@ -1,0 +1,31 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+class Bjk extends MX_Controller 
+{
+
+	/** function construct
+	------------------------------------------------------------------------ **/
+	function __construct()
+	{
+		parent::__construct();
+	}
+	
+	/** function index
+	------------------------------------------------------------------------ **/
+	public function index()
+	{
+		$this->bjk();
+	}
+	
+	public function bjk()
+	{
+		$data['coba']		= 'Isinya';
+		$data['css_menu']	= '<script>
+									document.getElementById("dashboard").className = "";
+									document.getElementById("forms_menu").className = "mega-menu active";
+									</script>';
+		$this->template->load('main_views','view_bjk',$data);
+	}
+}
+/* End of file bjk.php */
+/* Location: ./modules/bjk/controllers/bjk.php */

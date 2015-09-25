@@ -1,0 +1,12 @@
+p.gagal{
+				color: antiquewhite;
+				font-weight: bold;
+				background-color: #b55151;
+				padding: 5px;
+	}
+	p.sukses{
+				color: antiquewhite;
+				font-weight: bold;
+				background-color: #609450;
+				padding: 5px;
+	}

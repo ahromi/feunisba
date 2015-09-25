@@ -1,0 +1,104 @@
+<?php
+	if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+/*Untuk Mengaktifkan icon link Form pada top menu*/
+	echo $css_menu;
+	/*
+		view_spak_admin.php -> Forms | View Admin SPAK
+	*/
+?>
+<ul class="breadcrumb">
+	<li>Lokasi : </li>
+	<li><a href="<?php echo site_url() ?>" class="glyphicons home"><i></i> Administrator SPAM FEUNISBA</a></li>
+	<li class="divider"> | </li>
+	<li>Forms</li>
+	<li class="divider"> | </li>
+	<li>Admin SPAK</li>
+</ul>
+
+<h3>Admin SPAK</h3>
+<div class="innerLR">
+	<!-- Widget -->
+	<div class="widget widget-heading-simple widget-body-gray">
+		<div class="widget-body">
+		
+			<!-- Table -->
+			<table class="dynamicTable tableTools table table-striped table-bordered table-condensed table-white ">
+			
+				<!-- Table heading -->
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>Nama</th>
+						<th>NPM</th>
+						<th>Prodi</th>
+						<th>Tanggal Pengajuan</th>
+						<th>Tanggal Pemrosesan</th>
+						<th>Tanggal Pengesahan</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<!-- // Table heading END -->
+				
+				<!-- Table body -->
+				<tbody>
+					<?php
+					if($hasil!=''){ $i = 1;
+									foreach($hasil as $data){ ?>
+					<!-- Table row -->
+					<tr class="gradeC">
+						<td><?php echo $i++."."; ?></td>
+						<td><?php echo $data->nama?></td>
+						<td><?php $pengguna = $data->npm; echo $pengguna; ?></td>
+						<td><?php echo $data->prodi?></td>
+						<td ><?php echo $data->tgl_pengajuan?></td>
+						<td><?php echo $data->tgl_pemrosesan?></td>
+						<td ><?php echo $data->tgl_pengesahan?></td>
+						<td><?php
+									//$attr	=  
+									if($data->status =='0') 
+										{  
+											echo anchor('index.php/spak/lihatDetailSpak?zXdu87='.$data->idfe_spak,'Proses',array('class' => 'glyphicons no-js check'));
+										}elseif($data->status=='1')
+										{ 
+											echo anchor('index.php/spak/cetakSpak?zXdu87='.$data->idfe_spak,'Cetak',array('class' => 'glyphicons no-js check'));
+										}else
+										{
+											echo anchor('index.php/spak/cetakSpak?zXdu87='.$data->idfe_spak,'Cetak Lagi',array('class' => 'glyphicons no-js check'));
+										}
+							?>
+						</td>
+					</tr><?php }}else{ echo "Data Tidak Ditemukan";}
+						
+					?>
+					<!-- // Table row END -->
+					
+				</tbody>
+				<!-- // Table body END -->
+				
+			</table>
+			<!-- // Table END -->
+			
+			
+	</div>		
+		<!-- // Widget END -->
+		
+</div>
+
+<script type="text/javascript">
+//Load data DPP terakhir ke modal
+/*$('#lihat-dpp').on('shown', function()
+{
+	var modal = $(this);
+	// load content with AJAX
+	$.ajax({
+		url: '/var/www/html/uploads/10090100003/irfan/JPG',
+		success: function(data){
+  			modal.find('.modal-body').html(data);
+		}
+	});
+});*/
+
+</script>
+
+<br />
+<br />
